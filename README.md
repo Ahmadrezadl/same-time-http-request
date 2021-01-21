@@ -1,6 +1,8 @@
 # Send HTTP Requests at same time.
 
-## How to send same request for n times at same time:
+## Install Requirements:
+    pip install -r requirements.txt
+## How to send same request for n times at the same time:
     python main.py [url] [options]
 | Option    | shortCMD | type   | default | help              |
 |-----------|----------|--------|---------|-------------------|
