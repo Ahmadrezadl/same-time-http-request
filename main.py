@@ -1,35 +1,29 @@
 import threading
-import time
 import requests
-
-start = False
-url = 'https://webhook.site/16a868b7-15b5-4a4d-9aa9-9c5b0e16b188'
-myobj = {
-    "localization": 0,
-    "cvv2": "837",
-    "terminalNumber": "12345",
-    "amount": 1000,
-    "approvalCode": "77777777",
-    "sourceAddress": "127.0.0.1",
-    "destinationPAN": "6280231400741541",
-    "sourcePAN": "6280231400751300",
-    "terminalType": 1,
-    "expiryDate": "9909",
-    "pin": "123456",
-    "referenceNumber": "7",
-    "acceptorCode": "000000009999432",
-    "securityControl": 0,
-    "trackingNumber": "13e447f23ea6450bb843cbfcc2d62b2c"
-}
+import click
 
 
-def send_request():
-    while not start:continue
-    x = requests.post(url, json=myobj, headers={"Authorization": "Basic dXNlcjp1c2Vy"})
-    print(x.text)
+@click.command()
+@click.argument('url')
+@click.option('--method', '-m', default='get', help='Request method')
+@click.option('--body', '-b', default='', help='Request body')
+@click.option('--headers', '-h', default='', help='Request headers')
+@click.option('--count', '-c', default=10, help='Number of threads')
+@click.option('--timeout', '-t', default=2.50, help='Request timeout time')
+def main(url, method, body, headers, count, timeout):
+    start = False
+
+    def send_request():
+        while not start: continue
+        if method == 'get':
+            requests.get(url, headers=headers, timeout=timeout)
+        else:
+            requests.request(method, url, headers=headers, body=body, timeout=timeout)
+    for i in range(count):
+        threading.Thread(target=send_request).start()
+
+    start = True
 
 
-for i in range(30):
-    threading.Thread(target=send_request,args=[t]).start()
-
-start = True
+if __name__ == "__main__":
+    main()
